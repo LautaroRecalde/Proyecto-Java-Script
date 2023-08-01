@@ -43,6 +43,27 @@ function comprarHorasDeVuelo() {
   const montoPagadoTotal = sumarMontos(cliente.montosPagados);
   const vuelto = montoPagadoTotal - cliente.costoTotal;
   alert("¡Gracias por tu compra, " + cliente.nombre + "! Tu vuelto es de $" + vuelto);
+
+
+  // Filtrar montos mayores a 50
+  const montosMayoresA50 = cliente.montosPagados.filter(monto => monto > 50);
+  console.log("Montos mayores a $50:", montosMayoresA50);
+
+  // Encontrar el primer monto mayor a 100
+  const primerMontoMayorA100 = cliente.montosPagados.find(monto => monto > 100);
+  console.log("Primer monto mayor a $100:", primerMontoMayorA100);
+
+  // Encontrar el índice del monto 70
+  const indiceMonto70 = cliente.montosPagados.indexOf(70);
+  console.log("Índice del monto $70:", indiceMonto70);
+
+  // Verificar si hay montos mayores a 200
+  const hayMontosMayoresA200 = cliente.montosPagados.some(monto => monto > 200);
+  console.log("¿Hay montos mayores a $200?:", hayMontosMayoresA200);
+
+  // Encontrar el índice del primer monto mayor a 80
+  const indicePrimerMontoMayorA80 = cliente.montosPagados.findIndex(monto => monto > 80);
+  console.log("Índice del primer monto mayor a $80:", indicePrimerMontoMayorA80);
 }
 
 function obtenerHorasDeseadas(nombre) {
