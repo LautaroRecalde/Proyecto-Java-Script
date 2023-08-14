@@ -7,92 +7,123 @@ class Cliente {
   }
 }
 
-function comprarHorasDeVuelo() {
-  const precioHorasDeVuelo = 115;
+function mostrarMensaje(mensaje) {
+  alert(mensaje);
+}
 
+function obtenerHorasDeseadas() {
   const nombre = document.getElementById("nombre").value;
 
   if (!nombre) {
-    alert("Por favor, ingrese su nombre.");
+    mostrarMensaje("Por favor, ingrese su nombre.");
     return;
   }
 
-  let horasDeseadas = obtenerHorasDeseadas(nombre);
-  const costoTotal = precioHorasDeVuelo * horasDeseadas;
+  const horasDeseadasDiv = document.getElementById("horasDeseadas");
+  horasDeseadasDiv.style.display = "block";
+  document.getElementById("btnIngresarHoras").disabled = true;
+}
 
-  alert("Total a pagar por " + horasDeseadas + " horas de vuelo es de $" + costoTotal);
+function calcularTotal() {
+  const cantidadHoras = parseInt(document.getElementById("cantidadHoras").value);
 
-  const cliente = new Cliente(nombre, horasDeseadas, costoTotal);
+  if (!cantidadHoras || isNaN(cantidadHoras) || cantidadHoras <= 0) {
+    mostrarMensaje("Ingrese una cantidad válida de horas de vuelo.");
+    return;
+  }
 
-  while (sumarMontos(cliente.montosPagados) < cliente.costoTotal) {
-    const montoParcial = obtenerMontoParcial(cliente.nombre);
+  const precioHorasDeVuelo = 115;
+  const total = precioHorasDeVuelo * cantidadHoras;
 
-    if (montoParcial > 0) {
-      cliente.montosPagados.push(montoParcial);
+  alert("El total a pagar por " + cantidadHoras + " horas de vuelo es de $" + total);
 
-      const montoPagado = sumarMontos(cliente.montosPagados);
-      if (montoPagado < cliente.costoTotal) {
-        const montoRestante = cliente.costoTotal - montoPagado;
-        alert("Monto insuficiente, no seas tacaño " + cliente.nombre + ". Debe pagar $" + montoRestante + " adicionales para completar el costo total.");
-      }
-    } else {
-      alert("Ingrese un monto válido, " + cliente.nombre + ".");
-    }
+  const pagoDiv = document.getElementById("pago");
+  pagoDiv.style.display = "block";
+  document.getElementById("btnCalcularTotal").disabled = true;
+}
+
+let cliente;
+
+function realizarPago() {
+  const cantidadPago = parseFloat(document.getElementById("cantidadPago").value);
+
+  if (!cantidadPago || isNaN(cantidadPago) || cantidadPago <= 0) {
+    mostrarMensaje("Ingrese una cantidad válida de pago.");
+    return;
+  }
+
+  if (!cliente) {
+    const cantidadHoras = parseInt(document.getElementById("cantidadHoras").value);
+    const precioHorasDeVuelo = 115;
+    const total = precioHorasDeVuelo * cantidadHoras;
+    cliente = new Cliente("", cantidadHoras, total);
   }
 
   const montoPagadoTotal = sumarMontos(cliente.montosPagados);
-  const vuelto = montoPagadoTotal - cliente.costoTotal;
-  alert("¡Gracias por tu compra, " + cliente.nombre + "! Tu vuelto es de $" + vuelto);
+  const saldoPendiente = cliente.costoTotal - montoPagadoTotal;
 
-
-  // Filtrar montos mayores a 50
-  const montosMayoresA50 = cliente.montosPagados.filter(monto => monto > 50);
-  console.log("Montos mayores a $50:", montosMayoresA50);
-
-  // Encontrar el primer monto mayor a 100
-  const primerMontoMayorA100 = cliente.montosPagados.find(monto => monto > 100);
-  console.log("Primer monto mayor a $100:", primerMontoMayorA100);
-
-  // Encontrar el índice del monto 70
-  const indiceMonto70 = cliente.montosPagados.indexOf(70);
-  console.log("Índice del monto $70:", indiceMonto70);
-
-  // Verificar si hay montos mayores a 200
-  const hayMontosMayoresA200 = cliente.montosPagados.some(monto => monto > 200);
-  console.log("¿Hay montos mayores a $200?:", hayMontosMayoresA200);
-
-  // Encontrar el índice del primer monto mayor a 80
-  const indicePrimerMontoMayorA80 = cliente.montosPagados.findIndex(monto => monto > 80);
-  console.log("Índice del primer monto mayor a $80:", indicePrimerMontoMayorA80);
-}
-
-function obtenerHorasDeseadas(nombre) {
-  let horasDeseadas;
-  let horasValidas = false;
-
-  while (!horasValidas) {
-    horasDeseadas = parseInt(prompt("¿Cuántas horas de vuelo deseas comprar, " + nombre + "?"));
-
-    if (!isNaN(horasDeseadas) && horasDeseadas > 0) {
-      horasValidas = true;
-    } else {
-      alert("Ingrese un número válido de horas de vuelo, " + nombre + ".");
-    }
+  if (cantidadPago > saldoPendiente) {
+    mostrarMensaje("El monto pagado supera el costo pendiente.");
+    return;
   }
 
-  return horasDeseadas;
-}
+  cliente.montosPagados.push(cantidadPago);
+  guardarClienteEnStorage(cliente);
 
-function obtenerMontoParcial(nombre) {
-  const montoParcial = parseFloat(prompt("Ingrese la cantidad de dinero que pagará, " + nombre + ":"));
-
-  if (!isNaN(montoParcial) && montoParcial > 0) {
-    return montoParcial;
+  if (montoPagadoTotal + cantidadPago === cliente.costoTotal) {
+    alert("Gracias por tu compra. ¡Disfruta de tus horas de vuelo!");
   } else {
-    return 0;
+    const vuelto = saldoPendiente - cantidadPago;
+    alert("Gracias por tu compra. Tu vuelto es de $" + vuelto.toFixed(2));
   }
+
+  document.getElementById("pago").style.display = "none";
 }
 
 function sumarMontos(montos) {
   return montos.reduce((acc, val) => acc + val, 0);
 }
+
+function guardarClienteEnStorage(cliente) {
+  localStorage.setItem("cliente", JSON.stringify(cliente));
+}
+
+function obtenerClienteDeStorage() {
+  const clienteJSON = localStorage.getItem("cliente");
+  return clienteJSON ? JSON.parse(clienteJSON) : null;
+}
+
+window.onload = function () {
+  const clienteGuardado = obtenerClienteDeStorage();
+  if (clienteGuardado) {
+    cliente = clienteGuardado;
+    document.getElementById("nombre").value = cliente.nombre;
+    document.getElementById("cantidadHoras").value = cliente.horasDeseadas;
+    document.getElementById("cantidadPago").focus();
+  }
+};
+
+function filtrarMontosMayoresA(cantidad) {
+  if (!cliente) {
+    mostrarMensaje("Aún no ha ingresado los detalles de compra.");
+    return;
+  }
+
+  const montosMayores = cliente.montosPagados.filter(monto => monto > cantidad);
+  mostrarMensaje("Montos mayores a $" + cantidad + ": " + montosMayores.join(", "));
+}
+
+function encontrarPrimerMontoMayorA(cantidad) {
+  if (!cliente) {
+    mostrarMensaje("Aún no ha ingresado los detalles de compra.");
+    return;
+  }
+
+  const primerMontoMayor = cliente.montosPagados.find(monto => monto > cantidad);
+  if (primerMontoMayor) {
+    mostrarMensaje("Primer monto mayor a $" + cantidad + ": " + primerMontoMayor);
+  } else {
+    mostrarMensaje("No se encontró un monto mayor a $" + cantidad);
+  }
+}
+
