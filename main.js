@@ -35,11 +35,17 @@ function calcularTotal() {
   const precioHorasDeVuelo = 115;
   const total = precioHorasDeVuelo * cantidadHoras;
 
-  alert("El total a pagar por " + cantidadHoras + " horas de vuelo es de $" + total);
-
-  const pagoDiv = document.getElementById("pago");
-  pagoDiv.style.display = "block";
-  document.getElementById("btnCalcularTotal").disabled = true;
+  Swal.fire({
+    title: "El total a pagar por " + cantidadHoras + " horas de vuelo es de $" + total,
+    icon: "info",
+    confirmButtonText: "Continuar"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const pagoDiv = document.getElementById("pago");
+      pagoDiv.style.display = "block";
+      document.getElementById("btnCalcularTotal").disabled = true;
+    }
+  });
 }
 
 let cliente;
@@ -59,22 +65,18 @@ function realizarPago() {
     cliente = new Cliente("", cantidadHoras, total);
   }
 
-  const montoPagadoTotal = sumarMontos(cliente.montosPagados);
-  const saldoPendiente = cliente.costoTotal - montoPagadoTotal;
-
-  if (cantidadPago > saldoPendiente) {
-    mostrarMensaje("El monto pagado supera el costo pendiente.");
-    return;
-  }
-
   cliente.montosPagados.push(cantidadPago);
   guardarClienteEnStorage(cliente);
 
-  if (montoPagadoTotal + cantidadPago === cliente.costoTotal) {
-    alert("Gracias por tu compra. ¡Disfruta de tus horas de vuelo!");
+  const montoPagadoTotal = sumarMontos(cliente.montosPagados);
+  const saldoPendiente = cliente.costoTotal - montoPagadoTotal;
+
+  if (cantidadPago >= saldoPendiente) {
+    const vuelto = cantidadPago - cliente.costoTotal;
+    Swal.fire("Gracias por tu compra. ¡Disfruta de tus horas de vuelo! Tu vuelto es de $" + vuelto.toFixed(2));
   } else {
-    const vuelto = saldoPendiente - cantidadPago;
-    alert("Gracias por tu compra. Tu vuelto es de $" + vuelto.toFixed(2));
+    const restantePendiente = saldoPendiente - cantidadPago;
+    alert("Pago registrado. Aún tienes un saldo pendiente de $" + restantePendiente.toFixed(2));
   }
 
   document.getElementById("pago").style.display = "none";
@@ -126,4 +128,3 @@ function encontrarPrimerMontoMayorA(cantidad) {
     mostrarMensaje("No se encontró un monto mayor a $" + cantidad);
   }
 }
-
