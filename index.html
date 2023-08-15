@@ -8,25 +8,32 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <h1>Compra de Horas de Vuelo</h1>
-    <label for="nombre">Ingrese su nombre:</label>
-    <input type="text" id="nombre">
-    <button id="btnIngresarHoras" onclick="obtenerHorasDeseadas()">Ingresar horas deseadas</button>
-    
-    <div id="horasDeseadas" style="display: none;">
-        <label for="cantidadHoras">Ingrese la cantidad de horas de vuelo deseada:</label>
-        <input type="number" id="cantidadHoras" min="1">
-        <button id="btnCalcularTotal" onclick="calcularTotal()">Calcular Total</button>
-    </div>
-    
-    <div id="pago" style="display: none;">
-        <label for="cantidadPago">Ingrese la cantidad con la que va a pagar:</label>
-        <input type="number" id="cantidadPago" min="1">
-        <button id="btnRealizarPago" onclick="realizarPago()">Realizar Pago</button>
-    </div>
-    
-    <div id="mensaje">
-        <!-- Aquí se mostrarán los mensajes -->
+    <div id="container">
+        <h1>Compra de Horas de Vuelo</h1>
+        <label for="nombre">Ingrese su nombre:</label>
+        <input type="text" id="nombre">
+        <button id="btnIngresarHoras" onclick="obtenerHorasDeseadas()">Ingresar horas deseadas</button>
+        
+        <div id="horasDeseadas" style="display: none;">
+            <label for="cantidadHoras">Ingrese la cantidad de horas de vuelo deseada:</label>
+            <input type="number" id="cantidadHoras" min="1">
+            <button id="btnCalcularTotal" onclick="calcularTotal()">Calcular Total</button>
+        </div>
+        
+        <div id="pago" style="display: none;">
+            <label for="cantidadPago">Ingrese la cantidad con la que va a pagar:</label>
+            <input type="number" id="cantidadPago" min="1">
+            <button id="btnRealizarPago" onclick="realizarPago()">Realizar Pago</button>
+        </div>
+        
+        <div id="mensaje">
+            <!-- Aquí se mostrarán los mensajes -->
+        </div>
+
+        <div id="historial">
+            <h2>Historial de Compras</h2>
+            <ul id="historialLista"></ul>
+        </div>
     </div>
 
     <script src="main.js"></script>

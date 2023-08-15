@@ -59,14 +59,15 @@ function realizarPago() {
   }
 
   if (!cliente) {
+    const nombre = document.getElementById("nombre").value;
     const cantidadHoras = parseInt(document.getElementById("cantidadHoras").value);
     const precioHorasDeVuelo = 115;
     const total = precioHorasDeVuelo * cantidadHoras;
-    cliente = new Cliente("", cantidadHoras, total);
+    cliente = new Cliente(nombre, cantidadHoras, total);
   }
 
   cliente.montosPagados.push(cantidadPago);
-  guardarClienteEnStorage(cliente);
+  guardarEnHistorial(cliente);
 
   const montoPagadoTotal = sumarMontos(cliente.montosPagados);
   const saldoPendiente = cliente.costoTotal - montoPagadoTotal;
@@ -80,19 +81,23 @@ function realizarPago() {
   }
 
   document.getElementById("pago").style.display = "none";
+
+  actualizarHistorial();
 }
 
 function sumarMontos(montos) {
   return montos.reduce((acc, val) => acc + val, 0);
 }
 
-function guardarClienteEnStorage(cliente) {
-  localStorage.setItem("cliente", JSON.stringify(cliente));
+function guardarEnHistorial(cliente) {
+  const historial = obtenerHistorialDeStorage() || [];
+  historial.push(cliente);
+  localStorage.setItem("historial", JSON.stringify(historial));
 }
 
-function obtenerClienteDeStorage() {
-  const clienteJSON = localStorage.getItem("cliente");
-  return clienteJSON ? JSON.parse(clienteJSON) : null;
+function obtenerHistorialDeStorage() {
+  const historialJSON = localStorage.getItem("historial");
+  return historialJSON ? JSON.parse(historialJSON) : [];
 }
 
 window.onload = function () {
@@ -103,7 +108,21 @@ window.onload = function () {
     document.getElementById("cantidadHoras").value = cliente.horasDeseadas;
     document.getElementById("cantidadPago").focus();
   }
+
+  actualizarHistorial();
 };
+
+function actualizarHistorial() {
+  const historialLista = document.getElementById("historialLista");
+  const historial = obtenerHistorialDeStorage();
+
+  historialLista.innerHTML = "<h3>Historial de Compras</h3>";
+  historial.forEach((cliente) => {
+    const listItem = document.createElement("li");
+    listItem.textContent = `${cliente.nombre} - Compró: ${cliente.horasDeseadas} horas - Pagó: $${sumarMontos(cliente.montosPagados).toFixed(2)}`;
+    historialLista.appendChild(listItem);
+  });
+}
 
 function filtrarMontosMayoresA(cantidad) {
   if (!cliente) {
@@ -128,3 +147,4 @@ function encontrarPrimerMontoMayorA(cantidad) {
     mostrarMensaje("No se encontró un monto mayor a $" + cantidad);
   }
 }
+
