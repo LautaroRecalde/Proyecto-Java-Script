@@ -15,7 +15,11 @@ function obtenerHorasDeseadas() {
   const nombre = document.getElementById("nombre").value;
 
   if (!nombre) {
-    mostrarMensaje("Por favor, ingrese su nombre.");
+    Swal.fire({
+  icon: 'error',
+  title: 'Oops...',
+  text: 'Ingresa tu nombre por favor!',
+})
     return;
   }
 
@@ -28,7 +32,11 @@ function calcularTotal() {
   const cantidadHoras = parseInt(document.getElementById("cantidadHoras").value);
 
   if (!cantidadHoras || isNaN(cantidadHoras) || cantidadHoras <= 0) {
-    mostrarMensaje("Ingrese una cantidad válida de horas de vuelo.");
+    Swal.fire({
+  icon: 'error',
+  title: 'Oops...',
+  text: 'Ingrese una cantidad valida de horas de vuelo!',
+})
     return;
   }
 
@@ -54,7 +62,11 @@ function realizarPago() {
   const cantidadPago = parseFloat(document.getElementById("cantidadPago").value);
 
   if (!cantidadPago || isNaN(cantidadPago) || cantidadPago <= 0) {
-    mostrarMensaje("Ingrese una cantidad válida de pago.");
+    Swal.fire({
+  icon: 'error',
+  title: 'Oops...',
+  text: 'Ingrese una cantidad valida de pago!',
+})
     return;
   }
 
@@ -66,23 +78,37 @@ function realizarPago() {
     cliente = new Cliente(nombre, cantidadHoras, total);
   }
 
-  cliente.montosPagados.push(cantidadPago);
-  guardarEnHistorial(cliente);
+  const pagar = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const montoPagadoTotal = sumarMontos(cliente.montosPagados);
+        const saldoPendiente = cliente.costoTotal - montoPagadoTotal;
 
-  const montoPagadoTotal = sumarMontos(cliente.montosPagados);
-  const saldoPendiente = cliente.costoTotal - montoPagadoTotal;
+        if (cantidadPago >= saldoPendiente) {
+          const vuelto = cantidadPago - cliente.costoTotal;
+          resolve(vuelto);
+        } else {
+          reject("Pago insuficiente. Aún tienes un saldo pendiente.");
+        }
+      }, 1000); // Simulamos una operación asincrónica con un retraso de 1 segundo
+    });
+  };
 
-  if (cantidadPago >= saldoPendiente) {
-    const vuelto = cantidadPago - cliente.costoTotal;
-    Swal.fire("Gracias por tu compra. ¡Disfruta de tus horas de vuelo! Tu vuelto es de $" + vuelto.toFixed(2));
-  } else {
-    const restantePendiente = saldoPendiente - cantidadPago;
-    alert("Pago registrado. Aún tienes un saldo pendiente de $" + restantePendiente.toFixed(2));
-  }
+  pagar()
+    .then((vuelto) => {
+      Swal.fire("Gracias por tu compra. ¡Disfruta de tus horas de vuelo! Tu vuelto es de $" + vuelto.toFixed(2));
+      cliente.montosPagados.push(cantidadPago);
+      guardarEnHistorial(cliente);
+      actualizarHistorial();
+
+      // Mostrar el historial de compras después de completar la compra
+      document.getElementById("historial").style.display = "block";
+    })
+    .catch((error) => {
+      alert(error);
+    });
 
   document.getElementById("pago").style.display = "none";
-
-  actualizarHistorial();
 }
 
 function sumarMontos(montos) {
@@ -147,4 +173,3 @@ function encontrarPrimerMontoMayorA(cantidad) {
     mostrarMensaje("No se encontró un monto mayor a $" + cantidad);
   }
 }
-
