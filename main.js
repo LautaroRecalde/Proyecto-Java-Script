@@ -16,10 +16,10 @@ function obtenerHorasDeseadas() {
 
   if (!nombre) {
     Swal.fire({
-  icon: 'error',
-  title: 'Oops...',
-  text: 'Ingresa tu nombre por favor!',
-})
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Ingresa tu nombre por favor!',
+    });
     return;
   }
 
@@ -33,10 +33,10 @@ function calcularTotal() {
 
   if (!cantidadHoras || isNaN(cantidadHoras) || cantidadHoras <= 0) {
     Swal.fire({
-  icon: 'error',
-  title: 'Oops...',
-  text: 'Ingrese una cantidad valida de horas de vuelo!',
-})
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Ingrese una cantidad válida de horas de vuelo!',
+    });
     return;
   }
 
@@ -63,10 +63,10 @@ function realizarPago() {
 
   if (!cantidadPago || isNaN(cantidadPago) || cantidadPago <= 0) {
     Swal.fire({
-  icon: 'error',
-  title: 'Oops...',
-  text: 'Ingrese una cantidad valida de pago!',
-})
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Ingrese una cantidad válida de pago!',
+    });
     return;
   }
 
@@ -173,3 +173,53 @@ function encontrarPrimerMontoMayorA(cantidad) {
     mostrarMensaje("No se encontró un monto mayor a $" + cantidad);
   }
 }
+
+// Nueva función para cargar datos con Ajax
+function cargarDatosConAjax() {
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", "data.json", true);
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      const clientesData = JSON.parse(xhr.responseText);
+      const clientes = clientesData.map(clienteData => new Cliente(clienteData.nombre, clienteData.horasDeseadas, clienteData.costoTotal));
+      console.log("Clientes cargados con Ajax:", clientes);
+      // Realizar acciones con los datos cargados, por ejemplo:
+      // - Mostrar los datos en la página
+      // - Realizar cálculos
+      // ...
+    }
+  };
+
+  xhr.send();
+}
+
+// Nueva función para cargar datos con Fetch
+function cargarDatosConFetch() {
+  fetch("data.json")
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Error en la solicitud Fetch");
+      }
+      return response.json();
+    })
+    .then(clientesData => {
+      const clientes = clientesData.map(clienteData => new Cliente(clienteData.nombre, clienteData.horasDeseadas, clienteData.costoTotal));
+      console.log("Clientes cargados con Fetch:", clientes);
+      // Realizar acciones con los datos cargados, por ejemplo:
+      // - Mostrar los datos en la página
+      // - Realizar cálculos
+      // ...
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+}
+
+// Llamar a las funciones para cargar datos en respuesta a un evento (por ejemplo, clic de un botón)
+document.getElementById("botonCargarDatos").addEventListener("click", () => {
+  cargarDatosConAjax();
+  cargarDatosConFetch();
+});
+
+
